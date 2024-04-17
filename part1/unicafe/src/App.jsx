@@ -5,24 +5,31 @@ const Button = ({ onClick, children }) => (
 );
 
 const StatisticLine = ({ text, votes }) => (
-	<p>
-		{text} {votes}
-	</p>
+	<tr>
+		<td>
+			{text} {votes}
+		</td>
+	</tr>
 );
 
 const Statistics = ({ totalGood, totalNeutral, totalBad }) => {
 	const totalVotes = totalBad + totalNeutral + totalGood;
 	const goodPercentage = (totalGood / totalVotes) * 100;
+	const average =
+		(totalGood * 1 + totalNeutral * 0 + totalBad * -1) / totalVotes;
 
 	if (totalVotes > 0) {
 		return (
-			<>
-				<StatisticLine text="Good" votes={totalGood} />
-				<StatisticLine text="Neutral" votes={totalNeutral} />
-				<StatisticLine text="Bad" votes={totalBad} />
-				<StatisticLine text="All" votes={totalVotes} />
-				<StatisticLine text="Positive" votes={goodPercentage + "%"} />
-			</>
+			<table>
+				<tbody>
+					<StatisticLine text="Good" votes={totalGood} />
+					<StatisticLine text="Neutral" votes={totalNeutral} />
+					<StatisticLine text="Bad" votes={totalBad} />
+					<StatisticLine text="All" votes={totalVotes} />
+					<StatisticLine text="Average" votes={average} />
+					<StatisticLine text="Positive" votes={goodPercentage + "%"} />
+				</tbody>
+			</table>
 		);
 	} else {
 		return <p>No feedback given</p>;
