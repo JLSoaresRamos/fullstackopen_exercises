@@ -1,5 +1,5 @@
 const App = () => {
-	const courseInfo = {
+	const course = {
 		name: "Half Stack application development",
 		parts: [
 			{ part: "Fundamentals of React", exercises: 10 },
@@ -8,7 +8,7 @@ const App = () => {
 		],
 		total: function () {
 			let sum = 0;
-			if (this.parts) {
+			if (this.parts.length > 0) {
 				this.parts.forEach((part) => {
 					sum += part.exercises;
 				});
@@ -17,24 +17,22 @@ const App = () => {
 		},
 	};
 
-	const totalExercises = courseInfo.total();
-
-	const Header = (props) => {
-		return <h1>{props.courseName}</h1>;
+	const Header = ({ courseName }) => {
+		return <h1>{courseName}</h1>;
 	};
 
-	const Part = (props) => {
+	const Part = ({ partName, exercises }) => {
 		return (
 			<p>
-				{props.partName} {props.exercises}
+				{partName} {exercises}
 			</p>
 		);
 	};
 
-	const Content = (props) => {
+	const Content = ({ partsInfo }) => {
 		return (
 			<>
-				{props.partsInfo.map((item, index) => (
+				{partsInfo.map((item, index) => (
 					<Part
 						key={item.part + index}
 						partName={item.part}
@@ -45,15 +43,15 @@ const App = () => {
 		);
 	};
 
-	const Total = (props) => {
-		return <p>Number of exercises {props.total}</p>;
+	const Total = ({ total }) => {
+		return <p>Number of exercises {total}</p>;
 	};
 
 	return (
 		<div>
-			<Header courseName={courseInfo.name} />
-			<Content partsInfo={courseInfo.parts} />
-			<Total total={totalExercises} />
+			<Header courseName={course.name} />
+			<Content partsInfo={course.parts} />
+			<Total total={course.total()} />
 		</div>
 	);
 };
