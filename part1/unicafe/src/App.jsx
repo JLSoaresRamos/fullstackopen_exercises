@@ -4,14 +4,29 @@ const Button = ({ onClick, children }) => (
 	<button onClick={onClick}>{children}</button>
 );
 
+const StatisticLine = ({ text, votes }) => (
+	<p>
+		{text} {votes}
+	</p>
+);
+
 const Statistics = ({ totalGood, totalNeutral, totalBad }) => {
-	return (
-		<>
-			<p>Good {totalGood}</p>
-			<p>Neutral {totalNeutral}</p>
-			<p>Bad {totalBad}</p>
-		</>
-	);
+	const totalVotes = totalBad + totalNeutral + totalGood;
+	const goodPercentage = (totalGood / totalVotes) * 100;
+
+	if (totalVotes > 0) {
+		return (
+			<>
+				<StatisticLine text="Good" votes={totalGood} />
+				<StatisticLine text="Neutral" votes={totalNeutral} />
+				<StatisticLine text="Bad" votes={totalBad} />
+				<StatisticLine text="All" votes={totalVotes} />
+				<StatisticLine text="Positive" votes={goodPercentage + "%"} />
+			</>
+		);
+	} else {
+		return <p>No feedback given</p>;
+	}
 };
 
 const App = () => {
