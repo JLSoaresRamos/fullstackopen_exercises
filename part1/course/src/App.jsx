@@ -17,17 +17,13 @@ const App = () => {
 		},
 	};
 
-	const Header = ({ courseName }) => {
-		return <h1>{courseName}</h1>;
-	};
+	const Header = ({ courseName }) => <h1>{courseName}</h1>;
 
-	const Part = ({ partName, exercises }) => {
-		return (
-			<p>
-				{partName} {exercises}
-			</p>
-		);
-	};
+	const Part = ({ partName, exercises }) => (
+		<p>
+			{partName} {exercises}
+		</p>
+	);
 
 	const Content = ({ partsInfo }) => {
 		return (
@@ -43,9 +39,7 @@ const App = () => {
 		);
 	};
 
-	const Total = ({ total }) => {
-		return <p>Number of exercises {total}</p>;
-	};
+	const Total = ({ total }) => <p>Number of exercises {total}</p>;
 
 	return (
 		<div>
