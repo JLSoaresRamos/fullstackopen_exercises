@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Numbers from "./components/Numbers";
+import Filter from "./components/Filter";
+import AddPerson from "./components/AddPerson";
 
 const App = () => {
 	const [persons, setPersons] = useState([
@@ -13,9 +15,7 @@ const App = () => {
 	const [filterValue, setFilterValue] = useState("");
 	const [filteredPersons, setFilteredPersons] = useState([]);
 
-	console.log(persons);
-
-	const preventSameName = () => persons.find((x) => x.name === newName);
+	const isNewNameInPersons = () => persons.find((x) => x.name === newName);
 
 	const addPerson = (e) => {
 		e.preventDefault();
@@ -26,7 +26,7 @@ const App = () => {
 			number: newPhone,
 		};
 
-		if (preventSameName()) {
+		if (isNewNameInPersons()) {
 			alert(`${newName} is already added to phonebook`);
 		} else {
 			setPersons(persons.concat(newPerson));
@@ -37,66 +37,32 @@ const App = () => {
 
 	const handleFilter = (e) => {
 		e.preventDefault();
-		const value = e.target.value.toLowerCase();
+
+		const value = e.target.value;
+		setFilterValue(value);
 
 		if (value.length > 0) {
-			setFilterValue(value);
-
 			const filteredPersons = persons.filter((person) => {
-				return person.name.toLowerCase().startsWith(value);
+				const personName = person.name.toLowerCase();
+				return personName.startsWith(value.toLowerCase());
 			});
-
 			setFilteredPersons(filteredPersons);
 		} else {
 			setFilteredPersons([]);
-			setFilterValue("");
 		}
 	};
 
 	return (
 		<div>
 			<h2>Phonebook</h2>
-			<form>
-				<div>
-					<label htmlFor="filterValue">Filter shows with:</label>
-					<input
-						type="text"
-						id="filterValue"
-						value={filterValue}
-						onChange={handleFilter}
-					/>
-				</div>
-			</form>
-			<form>
-				<h2>Add a new</h2>
-				<div>
-					<label htmlFor="name">name:</label>
-					<input
-						onChange={(e) => setNewName(e.target.value)}
-						value={newName}
-						type="text"
-						id="name"
-					/>
-					<div>
-						<label htmlFor="number">number:</label>
-						<input
-							onChange={(e) => setNewPhone(e.target.value)}
-							value={newPhone}
-							type="tel"
-							id="number"
-						/>
-					</div>
-				</div>
-				<div>
-					<button
-						type="submit"
-						onClick={addPerson}
-						aria-label="Add new person on phone list"
-					>
-						add
-					</button>
-				</div>
-			</form>
+			<Filter onChange={handleFilter} value={filterValue} />
+			<AddPerson
+				nameValue={newName}
+				phoneValue={newPhone}
+				setNewName={setNewName}
+				setNewPhone={setNewPhone}
+				handleAddPerson={addPerson}
+			/>
 			<Numbers
 				persons={filteredPersons.length > 0 ? filteredPersons : persons}
 			/>
