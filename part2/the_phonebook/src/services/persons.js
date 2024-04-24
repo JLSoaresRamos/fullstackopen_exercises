@@ -14,11 +14,17 @@ function addNewPerson(newPerson) {
 
 function deletePerson(id) {
 	const promise = axios.delete(`${baseUrl}/${id}`);
-	return promise.then((response) => console.log(response.data));
+	return promise.then((response) => response.data);
+}
+
+function updatePerson(id, newPerson) {
+	const promise = axios.put(`${baseUrl}/${id}`, newPerson);
+	return promise.then((response) => response.data);
 }
 
 export default {
 	getAll,
 	addNewPerson,
 	deletePerson,
+	updatePerson,
 };
