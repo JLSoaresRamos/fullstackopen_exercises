@@ -22,7 +22,7 @@ const Footer = () => {
 };
 
 const App = () => {
-	const [notes, setNotes] = useState([]);
+	const [notes, setNotes] = useState(null);
 	const [newNote, setNewNote] = useState("a new note...");
 	const [showAll, setShowAll] = useState(true);
 	const [errorMessage, setErrorMessage] = useState("some error happened...");
@@ -30,6 +30,10 @@ const App = () => {
 	useEffect(() => {
 		noteService.getAll().then((initialNotes) => setNotes(initialNotes));
 	}, []);
+
+	if (!notes) {
+		return null;
+	}
 
 	const toggleImportanceOf = (id) => {
 		const note = notes.find((n) => n.id === id);
