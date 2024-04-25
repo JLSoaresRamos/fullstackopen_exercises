@@ -1,6 +1,11 @@
 const Filter = ({ filterValue, setValue, onSubmitFilter }) => {
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		onSubmitFilter(filterValue);
+	};
+
 	return (
-		<form onSubmit={onSubmitFilter}>
+		<form onSubmit={handleSubmit}>
 			<label htmlFor="filter">Find country: </label>
 			<input
 				type="text"

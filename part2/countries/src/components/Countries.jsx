@@ -1,7 +1,14 @@
-const Countries = ({ countries }) => {
+const Countries = ({ countries, handleSearchCountry }) => {
 	//Render matches
 	if (countries.length > 1 && countries.length <= 10) {
-		return countries.map((country) => <p>{country.name.common}</p>);
+		return countries.map((country) => (
+			<p key={country.fifa}>
+				{country.name.common}{" "}
+				<button onClick={() => handleSearchCountry(country.name.common)}>
+					show
+				</button>
+			</p>
+		));
 	}
 
 	//Render info from the country
@@ -20,7 +27,7 @@ const Countries = ({ countries }) => {
 							<p>Capitals</p>
 							<ul>
 								{capital.map((c) => {
-									return <li>{c}</li>;
+									return <li key={c}>{c}</li>;
 								})}
 							</ul>
 						</div>
@@ -33,7 +40,7 @@ const Countries = ({ countries }) => {
 					<h2>Languages</h2>
 					<ul>
 						{countryLanguagesList.map((l) => (
-							<li>{l}</li>
+							<li key={l}>{l}</li>
 						))}
 					</ul>
 				</section>

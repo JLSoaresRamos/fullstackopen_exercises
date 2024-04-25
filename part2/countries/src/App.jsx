@@ -4,6 +4,7 @@ import axios from "axios";
 import Filter from "./components/Filter";
 import Countries from "./components/Countries";
 import Notification from "./components/Notification";
+import Weather from "./components/Weather";
 
 function App() {
 	const [countryToSearch, setCountryToSearch] = useState("");
@@ -15,24 +16,35 @@ function App() {
 
 		axios.get(url).then((response) => {
 			const countries = response.data;
-			const filteredCountries = countries.filter((x) =>
-				x.name.common.startsWith(countryToSearch)
-			);
 
-			setCoutries(filteredCountries);
+			if (countryToSearch.length > 0) {
+				const filteredCountries = countries.filter((x) =>
+					x.name.common.startsWith(countryToSearch)
+				);
+
+				setCoutries(filteredCountries);
+			} else {
+				setCoutries([]);
+			}
 		});
 	}, [countryToSearch]);
 
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		const url = `https://studies.cs.helsinki.fi/restcountries/api/name/${countryToSearch}`;
+	useEffect(() => {
+		if (countries.length > 10) {
+			setNotification("Too many matches, specify another filter");
+			return;
+		}
+
+		setNotification(null);
+	}, [countries]);
+
+	const handleSearchCountry = (country) => {
+		const url = `https://studies.cs.helsinki.fi/restcountries/api/name/${country}`;
 		axios
 			.get(url)
 			.then((response) => {
 				const country = response.data;
-				const countriesList = [];
-				countriesList[0] = country;
-				setCoutries(countriesList);
+				setCoutries([country]);
 			})
 			.catch((error) => {
 				if (error.response.status === 404) {
@@ -49,10 +61,14 @@ function App() {
 			<Filter
 				filterValue={countryToSearch}
 				setValue={setCountryToSearch}
-				onSubmitFilter={handleSubmit}
+				onSubmitFilter={handleSearchCountry}
 			/>
-			<Countries countries={countries} />
 			<Notification message={notification} />
+			<Countries
+				countries={countries}
+				handleSearchCountry={handleSearchCountry}
+			/>
+			{countries.length === 1 && <Weather country={countries[0]} />}
 		</main>
 	);
 }
