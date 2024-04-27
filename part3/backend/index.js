@@ -1,7 +1,9 @@
 const cors = require("cors");
 const express = require("express");
+
 const app = express();
 
+app.use(express.static("dist"));
 app.use(express.json());
 app.use(cors());
 
@@ -71,7 +73,7 @@ app.post("/api/notes", (request, response) => {
 	}
 
 	const note = {
-		content: body.content,
+		content: request.body.content,
 		important: Boolean(body.important) || false,
 		id: generateId(),
 	};
