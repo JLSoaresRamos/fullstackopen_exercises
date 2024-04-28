@@ -66,7 +66,7 @@ const generateId = () => {
 };
 
 app.post("/api/notes", (request, response) => {
-	if (!body.content) {
+	if (!request.body.content) {
 		return response.status(400).json({
 			error: "content missing",
 		});
@@ -74,7 +74,7 @@ app.post("/api/notes", (request, response) => {
 
 	const note = {
 		content: request.body.content,
-		important: Boolean(body.important) || false,
+		important: Boolean(request.body.important) || false,
 		id: generateId(),
 	};
 
