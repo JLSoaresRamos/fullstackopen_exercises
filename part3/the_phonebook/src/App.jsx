@@ -98,7 +98,7 @@ const App = () => {
 	};
 
 	const handleDeletePerson = (id) => {
-		const personToDelete = persons.find((n) => n.id === id);
+		const personToDelete = persons.find((n) => n._id === id);
 
 		const checkAnwser = confirm(`Delete ${personToDelete.name} ?`);
 
@@ -106,7 +106,7 @@ const App = () => {
 			personService
 				.deletePerson(id)
 				.then((returnedValue) => {
-					const newPersons = persons.filter((n) => n.id !== id);
+					const newPersons = persons.filter((n) => n._id !== id);
 					setPersons(newPersons);
 					return;
 				})
@@ -116,7 +116,7 @@ const App = () => {
 							`Information of ${personToDelete.name} has already been removed from server`
 						);
 						setMessageType("error");
-						setPersons(persons.filter((n) => n.id !== personToDelete.id));
+						setPersons(persons.filter((n) => n._id !== personToDelete._id));
 						setTimeout(() => {
 							setMessage(null);
 							setMessageType("sucess");
