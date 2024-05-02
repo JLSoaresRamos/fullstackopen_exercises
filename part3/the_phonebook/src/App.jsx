@@ -41,10 +41,10 @@ const App = () => {
 				const person = findPerson(newName);
 				const newPerson = { ...person, number: newPhone };
 				personService
-					.updatePerson(person.id, newPerson)
+					.updatePerson(person._id, newPerson)
 					.then((returnedValue) => {
 						setPersons(
-							persons.map((n) => (n.id !== newPerson.id ? n : returnedValue))
+							persons.map((n) => (n._id !== newPerson._id ? n : returnedValue))
 						);
 						setMessage(`Successfully updated number from ${newPerson.name}`);
 						setNewName("");

@@ -1,7 +1,6 @@
 import NumberLine from "./NumberLine";
 
 const Numbers = ({ persons, handleDeletePerson }) => {
-	console.log(persons);
 	return (
 		<section>
 			<h2>Numbers</h2>
