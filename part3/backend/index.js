@@ -1,5 +1,20 @@
 const cors = require("cors");
 const express = require("express");
+const mongoose = require("mongoose");
+
+const password = encodeURIComponent(process.argv[2]);
+
+const url = `mongodb+srv://jlramossoares:${password}@cluster0.3v4wk2l.mongodb.net/noteApp?retryWrites=true&w=majority&appName=Cluster0`;
+
+mongoose.set("strictQuery", false);
+mongoose.connect(url);
+
+const noteSchema = new mongoose.Schema({
+	content: String,
+	important: Boolean,
+});
+
+const Note = mongoose.model("Note", noteSchema);
 
 const app = express();
 
@@ -17,30 +32,14 @@ const requestLogger = (request, response, next) => {
 
 app.use(requestLogger);
 
-let notes = [
-	{
-		id: 1,
-		content: "HTML is easy",
-		important: true,
-	},
-	{
-		id: 2,
-		content: "Browser can execute only JavaScript",
-		important: false,
-	},
-	{
-		id: 3,
-		content: "GET and POST are the most important methods of HTTP protocol",
-		important: true,
-	},
-];
-
 app.get("/", (request, response) => {
 	response.send("<h1>Hello World</h1>");
 });
 
 app.get("/api/notes", (request, response) => {
-	response.json(notes);
+	Note.find({}).then((notes) => {
+		response.json(notes);
+	});
 });
 
 app.get("/api/notes/:id", (request, response) => {

@@ -1,3 +1,4 @@
+const Person = require("./models/person");
 var morgan = require("morgan");
 const express = require("express");
 const cors = require("cors");
@@ -15,29 +16,6 @@ morgan.token("body", function (req, res) {
 	return JSON.stringify(req.body);
 });
 
-let persons = [
-	{
-		id: 1,
-		name: "Arto Hellas",
-		number: "040-123456",
-	},
-	{
-		id: 2,
-		name: "Ada Lovelace",
-		number: "39-44-5323523",
-	},
-	{
-		id: 3,
-		name: "Dan Abramov",
-		number: "12-43-234345",
-	},
-	{
-		id: 4,
-		name: "Mary Poppendieck",
-		number: "39-23-6423122",
-	},
-];
-
 const PORT = process.env.PORT || 3001;
 
 app.get("/", (request, response) => {
@@ -45,64 +23,71 @@ app.get("/", (request, response) => {
 });
 
 app.get("/api/persons/", (request, response) => {
-	response.json(persons);
+	Person.find({}).then((persons) => {
+		response.json(persons);
+	});
 });
 
 app.get("/api/info/", (request, response) => {
-	response.send(`
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${new Date()}</p>
-    `);
+	Person.find({})
+		.then((persons) => {
+			response.send(`
+		<p>Phonebook has info for ${persons.length} people</p>
+		<p>${new Date()}</p>
+		`);
+		})
+		.catch((error) => {
+			console.log(error);
+			response.send("<p>Something gone wrong please try later...</p>");
+		});
 });
 
 app.get("/api/persons/:id", (request, response) => {
-	const id = Number(request.params.id);
-
-	const person = persons.find((p) => p.id === id);
-
-	if (person) {
+	Person.findById(request.params.id).then((person) => {
 		response.json(person);
-	} else {
-		response.status(404).end();
-	}
+	});
 });
 
 app.delete("/api/persons/:id", (request, response) => {
-	const id = Number(request.params.id);
-
-	persons = persons.filter((p) => p.id !== id);
-
-	response.status(202).end();
+	Person.findByIdAndDelete(request.params.id).then(() => {
+		response.status(202).end();
+	});
 });
 
-function getRandomInt(max) {
-	return Math.floor(Math.random() * max);
-}
-
 app.post("/api/persons/", (request, response) => {
-	const id = getRandomInt(10000);
+	const persons = Person.find({}).then((persons) => {
+		return persons;
+	});
 
-	if (request.body.name && request.body.number) {
-		const personNameAlreadyExists = [...persons]
-			.map((p) => p.name)
-			.includes(request.body.name);
+	persons
+		.then((persons) => {
+			if (request.body.name && request.body.number) {
+				const personNameAlreadyExists = [...persons]
+					.map((p) => p.name)
+					.includes(request.body.name);
 
-		if (personNameAlreadyExists) {
-			return response.status(403).json({ error: "Name must be unique" });
-		}
+				if (personNameAlreadyExists) {
+					return response.status(403).json({ error: "Name must be unique" });
+				}
 
-		const person = {
-			id: id,
-			name: request.body.name,
-			number: request.body.number,
-		};
+				const person = new Person({
+					name: request.body.name,
+					number: request.body.number,
+				});
 
-		persons = persons.concat(person);
-
-		response.json(person);
-	} else {
-		response.status(400).json({ error: "Please inform number and name" }).end();
-	}
+				person.save().then((returnedPerson) => {
+					response.json(returnedPerson);
+				});
+			} else {
+				response
+					.status(400)
+					.json({ error: "Please inform number and name" })
+					.end();
+			}
+		})
+		.catch((error) => {
+			response.json({ message: "Could not acess persons" });
+		});
 });
 
 app.listen(PORT, () => {
