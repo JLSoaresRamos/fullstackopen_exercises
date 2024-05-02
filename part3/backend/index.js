@@ -1,20 +1,7 @@
 const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
-
-const password = encodeURIComponent(process.argv[2]);
-
-const url = `mongodb+srv://jlramossoares:${password}@cluster0.3v4wk2l.mongodb.net/noteApp?retryWrites=true&w=majority&appName=Cluster0`;
-
-mongoose.set("strictQuery", false);
-mongoose.connect(url);
-
-const noteSchema = new mongoose.Schema({
-	content: String,
-	important: Boolean,
-});
-
-const Note = mongoose.model("Note", noteSchema);
+const Note = require("./models/note");
 
 const app = express();
 
@@ -43,26 +30,24 @@ app.get("/api/notes", (request, response) => {
 });
 
 app.get("/api/notes/:id", (request, response) => {
-	const id = Number(request.params.id);
-	const note = notes.find((n) => n.id === id);
-
-	if (note) {
-		response.json(note);
-	} else {
-		response.status(404).end();
-	}
+	Note.findById(request.params.id)
+		.then((note) => {
+			if (note) {
+				response.json(note);
+			} else {
+				response.status(404).end();
+			}
+		})
+		.catch((error) => next(error));
 });
 
 app.delete("/api/notes/:id", (request, response) => {
-	const id = Number(request.params.id);
-	notes = notes.filter((n) => n.id !== id);
-	response.status(204).end();
+	Note.findByIdAndDelete(request.params.id)
+		.then((deletedNote) => {
+			response.status(204).end();
+		})
+		.catch((error) => next(error));
 });
-
-const generateId = () => {
-	const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
-	return maxId + 1;
-};
 
 app.post("/api/notes", (request, response) => {
 	if (!request.body.content) {
@@ -71,15 +56,29 @@ app.post("/api/notes", (request, response) => {
 		});
 	}
 
-	const note = {
+	const note = new Note({
 		content: request.body.content,
 		important: Boolean(request.body.important) || false,
-		id: generateId(),
+	});
+
+	note.save().then((savedNote) => {
+		response.json(savedNote);
+	});
+});
+
+app.put("/api/notes/:id", (request, response) => {
+	const body = request.body;
+
+	const note = {
+		content: body.content,
+		important: body.important,
 	};
 
-	notes = notes.concat(note);
-
-	response.json(note);
+	Note.findByIdAndUpdate(request.params.id, note, { new: true })
+		.then((updatedNote) => {
+			response.json(updatedNote);
+		})
+		.catch((error) => next(error));
 });
 
 const unknownEndpoint = (request, response) => {
@@ -87,6 +86,18 @@ const unknownEndpoint = (request, response) => {
 };
 
 app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+	console.error(error.message);
+
+	if (error.name === "CastError") {
+		return response.status(400).send({ error: "malformatted id" });
+	}
+
+	next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 
