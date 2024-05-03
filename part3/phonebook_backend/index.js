@@ -16,25 +16,11 @@ morgan.token("body", function (req, res) {
 	return JSON.stringify(req.body);
 });
 
-const errorHandler = (error, request, response, next) => {
-	console.error(error.message);
-
-	if (error.name === "CastError") {
-		return response.status(400).send({ error: "malformatted id" });
-	}
-
-	next(error);
-};
-
-app.use(errorHandler);
-
-const PORT = process.env.PORT || 3001;
-
 app.get("/", (request, response) => {
 	response.send("<h1>Welcome to persons phonebook API</h1>");
 });
 
-app.get("/api/persons/", (request, response, error) => {
+app.get("/api/persons/", (request, response, next) => {
 	Person.find({})
 		.then((persons) => {
 			response.json(persons);
@@ -70,51 +56,67 @@ app.delete("/api/persons/:id", (request, response) => {
 });
 
 app.put("/api/persons/:id", (request, response, next) => {
-	const body = request.body;
+	const { name, number } = request.body;
 
 	const person = {
-		name: body.name,
-		number: body.number,
+		name: name,
+		number: number,
 	};
 
-	Person.findByIdAndUpdate(request.params.id, person, { new: true })
+	const opts = { new: true, runValidators: true };
+
+	Person.findByIdAndUpdate(request.params.id, person, opts)
 		.then((updatedPerson) => response.json(updatedPerson))
 		.catch((error) => next(error));
 });
 
-app.post("/api/persons/", (request, response) => {
+app.post("/api/persons/", (request, response, next) => {
+	const { name, number } = request.body;
+
 	const persons = Person.find({}).then((persons) => {
 		return persons;
 	});
 
-	persons
-		.then((persons) => {
-			if (request.body.name && request.body.number) {
-				const personNameAlreadyExists = [...persons]
-					.map((p) => p.name)
-					.includes(request.body.name);
+	persons.then((persons) => {
+		const personNameAlreadyExists = [...persons]
+			.map((p) => p.name)
+			.includes(request.body.name);
 
-				if (personNameAlreadyExists) {
-					return response.status(403).json({ error: "Name must be unique" });
-				}
+		if (personNameAlreadyExists) {
+			return response.status(403).json({ error: "Name must be unique" });
+		}
 
-				const person = new Person({
-					name: request.body.name,
-					number: request.body.number,
-				});
+		const person = new Person({
+			name: name,
+			number: number,
+		});
 
-				person.save().then((returnedPerson) => {
-					response.json(returnedPerson);
-				});
-			} else {
-				response
-					.status(400)
-					.json({ error: "Please inform number and name" })
-					.end();
-			}
-		})
-		.catch((error) => next(error));
+		person
+			.save()
+			.then((returnedPerson) => {
+				response.json(returnedPerson);
+			})
+			.catch((error) => next(error));
+	});
 });
+
+const errorHandler = (error, request, response, next) => {
+	console.error(error.message);
+
+	if (error.name === "CastError") {
+		return response.status(400).send({ error: "malformatted id" });
+	}
+
+	if (error.name === "ValidationError") {
+		return response.status(400).json({ error: error.message });
+	}
+
+	next(error);
+};
+
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
 	console.log(`API running at port ${PORT}`);
