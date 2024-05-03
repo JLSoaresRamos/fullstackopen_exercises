@@ -1,6 +1,4 @@
 const AddPerson = ({ person, handleAddPerson, setPerson }) => {
-	console.log(person);
-
 	return (
 		<form>
 			<h2>Add a new</h2>

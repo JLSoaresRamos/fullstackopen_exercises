@@ -57,12 +57,18 @@ const App = () => {
 						resetPersonFields();
 					})
 					.catch((error) => {
+						if (error.response.status === 400) {
+							setNotification({
+								message: error.response.data.error,
+								type: "error",
+							});
+						}
+
 						if (error.response.status === 404) {
 							setNotification({
 								message: `Information of ${newPerson.name} has already been removed from server`,
 								type: "error",
 							});
-							setMessageType("error");
 							setPersons(persons.filter((n) => n.id !== newPerson.id));
 						}
 					});
