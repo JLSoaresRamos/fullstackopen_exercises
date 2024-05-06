@@ -8,7 +8,9 @@
 		"dev": "nodemon index.js",
 		"build:ui": "rm -rf dist && cd ../the_phonebook && npm run build && cp -r dist ../phonebook_backend && cd ../phonebook_backend",
 		"deploy:full": "npm run build:ui && git add . && git commit -m \"Deploy to Render\" && git push",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"lint": "eslint .",
+		"lint:fix:all": "eslint --fix ."
 	},
 	"author": "JLSoaresRamos",
 	"license": "MIT",
@@ -20,6 +22,9 @@
 		"morgan": "^1.10.0"
 	},
 	"devDependencies": {
+		"@stylistic/eslint-plugin-js": "^1.8.0",
+		"eslint": "^9.2.0",
+		"globals": "^15.1.0",
 		"nodemon": "^3.1.0"
 	}
 }
