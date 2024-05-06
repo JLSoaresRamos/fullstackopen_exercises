@@ -1,26 +1,20 @@
-const AddPerson = ({
-	nameValue,
-	phoneValue,
-	setNewName,
-	setNewPhone,
-	handleAddPerson,
-}) => {
+const AddPerson = ({ person, handleAddPerson, setPerson }) => {
 	return (
 		<form>
 			<h2>Add a new</h2>
 			<div>
 				<label htmlFor="name">name:</label>
 				<input
-					onChange={(e) => setNewName(e.target.value)}
-					value={nameValue}
+					onChange={(e) => setPerson({ ...person, name: e.target.value })}
+					value={person.name}
 					type="text"
 					id="name"
 				/>
 				<div>
 					<label htmlFor="number">number:</label>
 					<input
-						onChange={(e) => setNewPhone(e.target.value)}
-						value={phoneValue}
+						onChange={(e) => setPerson({ ...person, number: e.target.value })}
+						value={person.number}
 						type="tel"
 						id="number"
 					/>
