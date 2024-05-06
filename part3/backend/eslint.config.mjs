@@ -7,7 +7,7 @@ export default [
   { files: ['**/*.js'], languageOptions: { sourceType: 'commonjs' } },
   { languageOptions: { globals: globals.node } },
   { plugins: { '@stylistic/js': stylisticJs } },
-  { ignores: ['dist', './node_modules'] },
+  { ignores: ['dist', 'node_modules'] },
   {
     rules: {
       'eqeqeq': ['error'],
