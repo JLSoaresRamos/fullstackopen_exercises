@@ -81,6 +81,23 @@ test("The author and title is missing", async () => {
 	await api.post("/api/blogs/").send(blog).expect(400);
 });
 
+test("Delete a blog by his id", async () => {
+	const firstBlogId = (await helper.blogsInDb())[0].id;
+
+	await api.delete(`/api/blogs/${firstBlogId}`).expect(202);
+});
+
+test("Update like from a blog", async () => {
+	const firstBlog = (await helper.blogsInDb())[0];
+	const firstBlogPlusOneLike = { ...firstBlog, likes: 1 };
+
+	await api
+		.put(`/api/blogs/${firstBlog.id}`)
+		.send(firstBlogPlusOneLike)
+		.expect(200)
+		.expect("Content-Type", /application\/json/);
+});
+
 after(async () => {
 	await mongoose.connection.close();
 });
