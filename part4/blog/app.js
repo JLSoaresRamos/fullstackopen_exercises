@@ -1,10 +1,12 @@
 const express = require("express");
 const app = express();
+
 const cors = require("cors");
 const mongoose = require("mongoose");
+
 const { MONGODB_URI } = require("./utils/config");
-const middleware = require("./utils/middleware");
 const blogsRouter = require("./controllers/blogs");
+const middleware = require("./utils/middleware");
 const logger = require("./utils/logger");
 
 logger.info(`Connecting to MongoDB...\n\nURI: ${MONGODB_URI}`);

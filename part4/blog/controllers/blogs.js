@@ -10,21 +10,27 @@ blogsRouter.get("/", (request, response) => {
 blogsRouter.post("/", (request, response) => {
 	const { title, author, url, likes } = request.body;
 
-	const blog = new Blog({
-		title: title,
-		author: author,
-		url: url,
-		likes: likes,
-	});
-
-	blog
-		.save()
-		.then((newBlog) => {
-			response.status(201).json(newBlog);
-		})
-		.catch((error) => {
-			logger.error(error);
+	if (title && author) {
+		const blog = new Blog({
+			title: title,
+			author: author,
+			url: url,
+			likes: likes || 0,
 		});
+
+		blog
+			.save()
+			.then((newBlog) => {
+				response.status(201).json(newBlog);
+			})
+			.catch((error) => {
+				logger.error(error);
+			});
+
+		return;
+	}
+
+	return response.status(400).json({ error: "title or author is missing" });
 });
 
 module.exports = blogsRouter;
